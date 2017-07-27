@@ -61,7 +61,7 @@ savefigs(fig, object_name)
 
 
 # Evaluate log-likelihood for ~5000 Kepler points
-N = 5000 # Approximate number of points.
+N = 1000 # Approximate number of points.
 S = int(float(len(light_curve))/N)
 t_sparse_kepler = light_curve["TIME"][::S]
 y_sparse_kepler = light_curve["FLUX"][::S]
@@ -104,15 +104,15 @@ fiducial_value = OrderedDict([
     ("delta_nu", 10.87e-6),
     ("nu_max", nu_max),
     ("bell_height", None),
-    ("bell_width", 10e-6),
+    ("bell_width", None), #8 * delta_nu * nu_max),
     ("r_01", 0.5)
 ])
 parameter_names = fiducial_value.keys()
 
 
 grid_points = {
-    #"bell_width": np.logspace(-12, 3, 10),
-    "bell_height": np.logspace(-15, -5, 10),
+    "bell_width": np.logspace(-12, -5, 50),
+    "bell_height": np.logspace(-30, 5, 50),
 }
 
 # Do a grid and select values if necessary.
@@ -150,7 +150,7 @@ for i, theta in enumerate(thetas):
 idx = parameter_names.index("bell_width")
 if np.unique(thetas[:, idx]).size > 1:
     # Only take reasonable bell widths
-    ok = thetas[:, idx] < 10e-4
+    ok = thetas[:, idx] < 10**(-5.5)
 else:
     ok = np.ones(len(thetas), dtype=bool)
 
@@ -221,6 +221,9 @@ for k, (parameter_name, grid_points) in enumerate(plot_grids):
 
     for i, theta in enumerate(plot_thetas):
         print(parameter_name, i, P)
+
+        #theta = [each for each in theta]
+        #theta[4] = None
         plot_ll[i] = model.marginalized_log_likelihood(theta, t, y)
 
     scale = scales.get(parameter_name, 1)

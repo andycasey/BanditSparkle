@@ -25,22 +25,19 @@ from model import AsteroseismicModel
 
 
 
-
+amplitudes = 1e-6
 nu_max, nu_max_error = (4.44e-6, 0.27e-6) # [Hz]
 delta_nu, delta_nu_error = (0.88e-6, 0.03e-6) # [Hz]
 
 
-
 model = AsteroseismicModel()
 
+t = cadence.gaia("")
+y = model.predict_light_curve(t, nu_max, delta_nu, amplitudes=amplitudes)
+omega, ft = model.predict_power_spectrum(t, nu_max, delta_nu, amplitudes=amplitudes)
 
-# To check against sim_lightcurves.py
-nu_max, delta_nu = (0.001372985232493267, 0.050479027931386776)
 
-t = cadence.tess()
 
-y = model.predict_light_curve(t, nu_max, delta_nu)
-omega, ft = model.predict_power_spectrum(t, nu_max, delta_nu)
 
 
 fig, axes = plt.subplots(3)
